@@ -10,14 +10,7 @@ import cors from "cors";
 const app = express();
 const port = 3000;
 // Enable CORS
-app.use(
-    cors({
-        origin: "*",
-        methods: "GET, POST",
-        allowedHeaders: "Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods",
-    })
-);
-app.options("*", cors());
+app.use(cors());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -37,8 +30,18 @@ const upload = multer({ storage });
 
 // Serve static files (image) from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// When client starts, load image instantly for client after they request for new image
+app.get("/image", (req, res) => {
+    const imagePath = path.join(__dirname, "uploads", "image.png");
+    console.log(imagePath);
+    res.sendFile(imagePath, (err) => {
+        if (err) {
+            console.error("Error:", err);
+        }
+    });
+});
 
-// Endpoint to handle the image upload
+// Endpoint to handle the image upload. When client uploads image, do this
 app.post("/upload", upload.single("file"), (req, res) => {
     console.log("Image upload");
     const tempPath = req.file.path;
@@ -48,18 +51,18 @@ app.post("/upload", upload.single("file"), (req, res) => {
         fs.rename(tempPath, targetPath, (err) => {
             if (err) return;
 
-            res.status(200).contentType("text/plain").end("File uploaded!");
+            res.status(200).contentType("text/plain").end();
         });
     } else {
         fs.unlink(tempPath, (err) => {
             if (err) return;
 
-            res.status(403).contentType("text/plain").end("Only .png files are allowed!");
+            res.status(403).contentType("text/plain").end("Only .png!");
         });
     }
 });
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log("Server running on http://localhost:${port}");
 });
