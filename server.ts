@@ -14,7 +14,7 @@ app.use(
     cors({
         origin: "https://websitetoliterallystore1pngimage.netlify.app/",
         methods: "GET, POST",
-        allowedHeaders: "Content-Type",
+        allowedHeaders: "Access-Control-Allow-Origin",
     })
 );
 
