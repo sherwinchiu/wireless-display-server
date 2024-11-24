@@ -12,11 +12,12 @@ const port = 3000;
 // Enable CORS
 app.use(
     cors({
-        origin: "https://websitetoliterallystore1pngimage.netlify.app/",
+        origin: "*",
         methods: "GET, POST",
-        allowedHeaders: "Access-Control-Allow-Origin",
+        allowedHeaders: "Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods",
     })
 );
+app.options("*", cors());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
