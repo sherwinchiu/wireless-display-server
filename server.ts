@@ -31,13 +31,16 @@ const bucket = storage.bucket(bucketName);
 // Local Storage Setup
 const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, os.tmpdir()); // Directory where the image will be saved
+        cb(null, "./uploads"); // Directory where the image will be saved
     },
     filename: (req, file, cb) => {
         cb(null, "image.png"); // Save the file as image.png (only one image at a time)
     },
 });
 const upload = multer({ storage: multer.memoryStorage() });
+if (!fs.existsSync("./uploads")) {
+    fs.mkdirSync("./uploads");
+}
 
 // Serve static files (image) from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
