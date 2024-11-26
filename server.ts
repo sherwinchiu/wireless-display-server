@@ -57,7 +57,7 @@ app.get("/image", (req, res) => {
     }
 });
 // Endpoint to handle the image upload. When client uploads image, do this
-app.post("/givemetheimage", (req, res) => {
+app.post("/imagehere", (req, res) => {
     try {
         const busboy = Busboy({ headers: req.headers }); // get busboyt to remove headers
         busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
