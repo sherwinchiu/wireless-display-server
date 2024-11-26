@@ -30,6 +30,7 @@ const __dirname = dirname(__filename);
 // }); // create new client
 const storage = new Storage();
 if (!fs.existsSync("uploads")) {
+    console.log("please upload");
     fs.mkdirSync("uploads");
 }
 const bucketName = "pixplay-442722.appspot.com"; // reference to bucket
