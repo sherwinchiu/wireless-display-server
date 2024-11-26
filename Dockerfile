@@ -1,17 +1,19 @@
 # Fetching the minified node image on apline linux
-FROM node:slim
+FROM node:18-alpine
 
 # Setting up the work directory
 WORKDIR /app
 
-# Copying all the files in our project
-COPY . .
+# Copying package.json
+COPY package*.json ./
 
 # Installing dependencies
 RUN npm install
 
-# Starting our application
-CMD [ "npx", "tsx", "server.ts"]
+COPY . .
 
 # Exposing server port
 EXPOSE 3000
+
+# Starting our application
+CMD [ "npx", "tsx", "server.ts"]

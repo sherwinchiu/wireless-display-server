@@ -5,10 +5,11 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
 import cors from "cors";
+import { Storage } from "@google-cloud/storage";
 
 // Create the Express app
 const app = express();
-const port = 3000;
+const port = 8080;
 // Enable CORS
 app.use(cors());
 
@@ -24,7 +25,7 @@ const bucket = storage.bucket(bucketName);
 // Initialize multer with the storage configuration
 const upload = multer({ dest: "uploads/" });
 // Init Docker
-
+/*
 app.get("/", (req, res) => {
     req.get({
         headers: {
@@ -33,7 +34,7 @@ app.get("/", (req, res) => {
         },
     });
     res.send("Dockerizing Node Application");
-});
+}); */
 
 // Serve static files (image) from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
