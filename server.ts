@@ -26,7 +26,7 @@ const __dirname = dirname(__filename);
 // Google Cloud Storage (GCS) Setup
 
 const storage = new Storage(); // create new client
-const bucketName = "my-one-bucket"; // reference to bucket
+const bucketName = "pixplay-442722.appspot.com"; // reference to bucket
 const bucket = storage.bucket(bucketName);
 // Local Storage Setup
 const multerStorage = multer.diskStorage({
@@ -38,9 +38,6 @@ const multerStorage = multer.diskStorage({
     },
 });
 const upload = multer({ storage: multer.memoryStorage() });
-if (!fs.existsSync("./uploads")) {
-    fs.mkdirSync("./uploads");
-}
 
 // Serve static files (image) from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -77,7 +74,7 @@ async function uploadFile(filePath) {
 }
 
 // Endpoint to handle the image upload. When client uploads image, do this
-app.post("/upload", upload.single("file"), (req, res) => {
+app.post("/upload", (req, res) => {
     console.log("Image upload");
     // directly stream to gcp
     const filePath = req.file.path;
