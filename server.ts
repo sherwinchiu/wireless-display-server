@@ -58,10 +58,12 @@ app.get("/image", (req, res) => {
 });
 
 async function uploadFile(filePath) {
+    const destination = path.basename(filePath);
     const options = {
-        destination: "image.png",
+        destination: destination,
     };
     await bucket.upload(filePath, options);
+    console.log("Should be uiploaded ");
 }
 
 // Endpoint to handle the image upload. When client uploads image, do this
@@ -72,7 +74,6 @@ app.post("/upload", upload.single("file"), (req, res) => {
             return res.status(400);
         }
         const tempFilePath = req.file.path;
-        const gcsFileName = "image.png";
 
         console.log("uploading...");
         // upload to gcs bucket! yay image stored
