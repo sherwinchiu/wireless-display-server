@@ -13,7 +13,7 @@ RUN npm install
 COPY . .
 
 # Exposing server port
-EXPOSE 3000
+EXPOSE 8080
 
 # Starting our application
 CMD [ "npx", "tsx", "server.ts"]
