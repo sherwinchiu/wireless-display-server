@@ -29,15 +29,6 @@ const storage = new Storage(); // create new client
 const bucketName = "pixplay-442722.appspot.com"; // reference to bucket
 const bucket = storage.bucket(bucketName);
 // Local Storage Setup
-const multerStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "./uploads"); // Directory where the image will be saved
-    },
-    filename: (req, file, cb) => {
-        cb(null, "image.png"); // Save the file as image.png (only one image at a time)
-    },
-});
-const upload = multer({ storage: multer.memoryStorage() });
 
 // Serve static files (image) from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -64,27 +55,29 @@ app.get("/image", (req, res) => {
     }
 });
 
-async function uploadFile(filePath) {
-    const destination = path.basename(filePath);
+async function uploadFile() {
     const options = {
-        destination: destination,
+        destination: "uploads/image.png",
     };
-    await bucket.upload(filePath, options);
+    await bucket.upload("uploads/image.png", options);
     console.log("Should be uiploaded ");
 }
 
 // Endpoint to handle the image upload. When client uploads image, do this
 app.post("/upload", (req, res) => {
     console.log("Image upload");
+    console.log(req.file.path);
+    uploadFile();
+    // pleassee just upload
     // directly stream to gcp
-    const filePath = req.file.path;
-    const blob = bucket.file(filePath);
-    const blobStream = blob.createWriteStream();
-    blobStream.on("finish", () => {
-        res.json({ success: true, message: "File uploaded successfully!" });
-    });
+    // const filePath = req.file.path;
+    // const blob = bucket.file(filePath);
+    // const blobStream = blob.createWriteStream();
+    // blobStream.on("finish", () => {
+    //     res.json({ success: true, message: "File uploaded successfully!" });
+    // });
 
-    blobStream.end(req.file.buffer);
+    // blobStream.end(req.file.buffer);
 });
 
 // Start the server
