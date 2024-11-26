@@ -29,11 +29,8 @@ const __dirname = dirname(__filename);
 //     projectId: "pixplay-442722",
 // }); // create new client
 const storage = new Storage();
-if (!fs.existsSync("uploads")) {
-    console.log("please upload");
-    fs.mkdirSync("uploads");
-}
-const bucketName = "pixplay-442722.appspot.com"; // reference to bucket
+
+const bucketName = "my-one-bucket"; // reference to bucket
 const bucket = storage.bucket(bucketName); // can do whatever we want to it :)
 app.get("/image", (req, res) => {
     try {
