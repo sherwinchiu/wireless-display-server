@@ -58,8 +58,9 @@ app.post("/upload", upload.single("file"), (req, res) => {
             // no file returned
             return res.status(400);
         }
-        const tempFilePath = req.file.path;
+        const tempFilePath = "./";
         const gcsFileName = "image.png";
+        console.log("uploading...");
         // upload to gcs bucket! yay image stored
         bucket.upload(tempFilePath, {
             destination: gcsFileName,
@@ -67,6 +68,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
                 contentType: req.file.mimetype,
             },
         });
+        console.log("succesfully uploaded!");
         fs.unlinkSync(tempFilePath);
         res.json({ success: true, message: "File uploaded successfully!" });
     } catch (error) {
