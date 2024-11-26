@@ -33,7 +33,7 @@ const bucket = storage.bucket(bucketName);
 const upload = multer({ dest: "uploads/" });
 
 // Serve static files (image) from the 'uploads' folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+//app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // When client starts, load image instantly for client after they request for new image. Loads from GCP
 app.get("/image", (req, res) => {
     try {
@@ -57,6 +57,13 @@ app.get("/image", (req, res) => {
     }
 });
 
+async function uploadFile(filePath) {
+    const options = {
+        destination: "image.png",
+    };
+    await bucket.upload(filePath, options);
+}
+
 // Endpoint to handle the image upload. When client uploads image, do this
 app.post("/upload", upload.single("file"), (req, res) => {
     try {
@@ -66,24 +73,12 @@ app.post("/upload", upload.single("file"), (req, res) => {
         }
         const tempFilePath = req.file.path;
         const gcsFileName = "image.png";
+
         console.log("uploading...");
         // upload to gcs bucket! yay image stored
-        bucket.upload(
-            tempFilePath,
-            {
-                destination: gcsFileName,
-                metadata: {
-                    contentType: req.file.mimetype,
-                },
-            },
-            (err, file) => {
-                if (err) {
-                    console.error("womp womp");
-                    return res.status(500).send("Error uploading image.");
-                }
-                fs.unlinkSync(tempFilePath); // Delete the temporary file
-            }
-        );
+        uploadFile(tempFilePath).catch(console.error);
+        fs.unlinkSync(tempFilePath); // Delete the temporary file
+
         console.log("succesfully uploaded!");
         res.json({ success: true, message: "File uploaded successfully!" });
     } catch (error) {
