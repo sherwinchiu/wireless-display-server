@@ -6,7 +6,6 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 import cors from "cors";
 import { Storage } from "@google-cloud/storage";
-import os from "os";
 
 // Create the Express app
 const app = express();
@@ -30,9 +29,8 @@ const bucketName = "pixplay-442722.appspot.com"; // reference to bucket
 const bucket = storage.bucket(bucketName);
 // Local Storage Setup
 
-// Serve static files (image) from the 'uploads' folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-// When client starts, load image instantly for client after they request for new image. Loads from GCP
+const upload = multer({ dest: "uploads/" });
+
 app.get("/image", (req, res) => {
     try {
         // get file from google cloud storage
@@ -55,29 +53,23 @@ app.get("/image", (req, res) => {
     }
 });
 
-async function uploadFile() {
+async function uploadFile(filePath) {
     const options = {
         destination: "uploads/image.png",
     };
-    await bucket.upload("uploads/image.png", options);
+    await bucket.upload(filePath, options);
     console.log("Should be uiploaded ");
 }
 
 // Endpoint to handle the image upload. When client uploads image, do this
-app.post("/upload", (req, res) => {
+app.post("/upload", upload.single("file"), (req, res) => {
     console.log("Image upload");
     console.log(req.file.path);
-    uploadFile();
-    // pleassee just upload
-    // directly stream to gcp
-    // const filePath = req.file.path;
-    // const blob = bucket.file(filePath);
-    // const blobStream = blob.createWriteStream();
-    // blobStream.on("finish", () => {
-    //     res.json({ success: true, message: "File uploaded successfully!" });
-    // });
+    uploadFile(req.file.path);
 
-    // blobStream.end(req.file.buffer);
+    fs.unlinkSync(req.file.path);
+
+    res.status(200).send("file shouldve been processed probably hopefully");
 });
 
 // Start the server
