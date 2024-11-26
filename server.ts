@@ -27,7 +27,7 @@ const bucket = storage.bucket(bucketName);
 const upload = multer({ dest: "/" });
 
 // Serve static files (image) from the 'uploads' folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/", express.static(path.join(__dirname, "")));
 // When client starts, load image instantly for client after they request for new image. Loads from GCP
 app.get("/image", (req, res) => {
     try {
