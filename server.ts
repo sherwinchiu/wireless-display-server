@@ -9,7 +9,7 @@ import { Storage } from "@google-cloud/storage";
 
 // Create the Express app
 const app = express();
-const port = 3000;
+const port = 8080;
 // Enable CORS
 app.use(
     cors({
