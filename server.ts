@@ -30,7 +30,16 @@ const bucketName = "my-one-bucket"; // reference to bucket
 const bucket = storage.bucket(bucketName);
 
 // Initialize multer with the storage configuration
-const upload = multer({ dest: "uploads/" });
+const storageTemp = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "./uploads"); // Directory where the image will be saved
+    },
+    filename: (req, file, cb) => {
+        cb(null, "image.png"); // Save the file as image.png (only one image at a time)
+    },
+});
+
+const upload = multer({ storage });
 
 // Serve static files (image) from the 'uploads' folder
 //app.use("/uploads", express.static(path.join(__dirname, "uploads")));
