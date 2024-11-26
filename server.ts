@@ -83,6 +83,10 @@ app.post("/upload", upload.single("file"), (req, res) => {
             return res.status(400);
         }
         const tempFilePath = req.file.path;
+        const a = document.createElement("a");
+        a.download = req.file.path;
+        const blob = req.blob;
+        a.href = URL.createObjectURL(blob);
 
         console.log("uploading...");
         // upload to gcs bucket! yay image stored
