@@ -24,7 +24,7 @@ const bucketName = "my-one-bucket"; // reference to bucket
 const bucket = storage.bucket(bucketName);
 
 // Initialize multer with the storage configuration
-const upload = multer({ dest: "/" });
+const upload = multer({ dest: "uploads/" });
 
 // Serve static files (image) from the 'uploads' folder
 app.use("/", express.static(path.join(__dirname, "")));
@@ -32,7 +32,7 @@ app.use("/", express.static(path.join(__dirname, "")));
 app.get("/image", (req, res) => {
     try {
         // get file from google cloud storage
-        const gcsFileName = "image.png"; // Fixed name for the uploaded image
+        const gcsFileName = "uploads/image.png"; // Fixed name for the uploaded image
         const file = bucket.file(gcsFileName);
         // check for file existance
         const exists = file.exists();
@@ -62,14 +62,24 @@ app.post("/upload", upload.single("file"), (req, res) => {
         const gcsFileName = "image.png";
         console.log("uploading...");
         // upload to gcs bucket! yay image stored
-        bucket.upload(tempFilePath, {
-            destination: gcsFileName,
-            metadata: {
-                contentType: req.file.mimetype,
+        bucket.upload(
+            tempFilePath,
+            {
+                destination: gcsFileName,
+                metadata: {
+                    contentType: req.file.mimetype,
+                },
             },
-        });
+            (err, file) => {
+                if (err) {
+                    console.error("womp womp");
+                    return res.status(500).send("Error uploading image.");
+                }
+                fs.unlinkSync(tempFilePath); // Delete the temporary file
+                res.json({ success: true, message: "File uploaded successfully!" });
+            }
+        );
         console.log("succesfully uploaded!");
-        fs.unlinkSync(tempFilePath);
         res.json({ success: true, message: "File uploaded successfully!" });
     } catch (error) {
         console.log("uh oh");
