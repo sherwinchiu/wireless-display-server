@@ -12,7 +12,13 @@ const stream = require("stream");
 const app = express();
 const port = 8080;
 // Enable CORS
-app.use(cors());
+app.use(
+    cors({
+        origin: "*", // Or specify your frontend URL if you want to limit origins
+        methods: ["GET", "POST"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
+);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -27,7 +33,7 @@ const bucket = storage.bucket(bucketName);
 const upload = multer({ dest: "uploads/" });
 
 // Serve static files (image) from the 'uploads' folder
-app.use("/", express.static(path.join(__dirname, "")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // When client starts, load image instantly for client after they request for new image. Loads from GCP
 app.get("/image", (req, res) => {
     try {
@@ -76,7 +82,6 @@ app.post("/upload", upload.single("file"), (req, res) => {
                     return res.status(500).send("Error uploading image.");
                 }
                 fs.unlinkSync(tempFilePath); // Delete the temporary file
-                res.json({ success: true, message: "File uploaded successfully!" });
             }
         );
         console.log("succesfully uploaded!");
