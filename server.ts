@@ -6,11 +6,10 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 import cors from "cors";
 import { Storage } from "@google-cloud/storage";
-const stream = require("stream");
 
 // Create the Express app
 const app = express();
-const port = 8080;
+const port = 3000;
 // Enable CORS
 app.use(
     cors({
@@ -28,9 +27,8 @@ const __dirname = dirname(__filename);
 const storage = new Storage(); // create new client
 const bucketName = "my-one-bucket"; // reference to bucket
 const bucket = storage.bucket(bucketName);
-
-// Initialize multer with the storage configuration
-const storageTemp = multer.diskStorage({
+// Local Storage Setup
+const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, "./uploads"); // Directory where the image will be saved
     },
@@ -38,8 +36,7 @@ const storageTemp = multer.diskStorage({
         cb(null, "image.png"); // Save the file as image.png (only one image at a time)
     },
 });
-
-const upload = multer({ storage });
+const upload = multer({ multerStorage });
 
 // Serve static files (image) from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -77,27 +74,31 @@ async function uploadFile(filePath) {
 
 // Endpoint to handle the image upload. When client uploads image, do this
 app.post("/upload", upload.single("file"), (req, res) => {
-    try {
-        if (!req.file) {
-            // no file returned
-            return res.status(400);
-        }
-        const tempFilePath = req.file.path;
-        const a = document.createElement("a");
-        a.download = req.file.path;
-        const blob = req.blob;
-        a.href = URL.createObjectURL(blob);
+    console.log("Image upload");
+    const tempPath = req.file.path;
+    // const targetPath = path.join(__dirname, "./uploads/image.png");
 
-        console.log("uploading...");
-        // upload to gcs bucket! yay image stored
-        uploadFile(tempFilePath).catch(console.error);
-        fs.unlinkSync(tempFilePath); // Delete the temporary file
+    // if (path.extname(req.file.originalname).toLowerCase() === ".png") {
+    //     fs.rename(tempPath, targetPath, (err) => {
+    //         if (err) return;
 
-        console.log("succesfully uploaded!");
-        res.json({ success: true, message: "File uploaded successfully!" });
-    } catch (error) {
-        console.log("uh oh");
-    }
+    //         res.status(200).contentType("text/plain").end();
+    //     });
+    // } else {
+    //     fs.unlink(tempPath, (err) => {
+    //         if (err) return;
+
+    //         res.status(403).contentType("text/plain").end("Only .png!");
+    //     });
+    // }
+
+    // console.log("uploading...");
+    // // upload to gcs bucket! yay image stored
+    uploadFile(tempPath).catch(console.error);
+    fs.unlinkSync(tempPath); // Delete the temporary file
+
+    console.log("succesfully uploaded!");
+    res.json({ success: true, message: "File uploaded successfully!" });
 });
 
 // Start the server
