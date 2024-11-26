@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 import cors from "cors";
 import { Storage } from "@google-cloud/storage";
+const Busboy = require("busboy");
 
 // Create the Express app
 const app = express();
@@ -24,9 +25,13 @@ const __dirname = dirname(__filename);
 
 // Google Cloud Storage (GCS) Setup
 
-const storage = new Storage(); // create new client
+const storage = new Storage({
+    keyFilename: path.join(__dirname, "./pixplay-442722-419ffc7a2404.json"),
+    projectId: "pixplay-442722",
+}); // create new client
+// storage.getBuckets().then((x) => console.log(x));
 const bucketName = "pixplay-442722.appspot.com"; // reference to bucket
-const bucket = storage.bucket(bucketName);
+const bucket = storage.bucket(bucketName); // can do whatever we want to it :)
 // Local Storage Setup
 
 const upload = multer({ dest: "uploads/" });
@@ -52,24 +57,18 @@ app.get("/image", (req, res) => {
         console.log("uh oh");
     }
 });
-
-async function uploadFile(filePath) {
-    const options = {
-        destination: "uploads/image.png",
-    };
-    await bucket.upload(filePath, options);
-    console.log("Should be uiploaded ");
-}
-
 // Endpoint to handle the image upload. When client uploads image, do this
-app.post("/upload", upload.single("file"), (req, res) => {
-    console.log("Image upload");
-    console.log(req.file.path);
-    uploadFile(req.file.path);
-
-    fs.unlinkSync(req.file.path);
-
-    res.status(200).send("file shouldve been processed probably hopefully");
+app.post("/upload", (req, res) => {
+    const busboy = Busboy({ headers: req.headers }); // get busboyt to remove headers
+    busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+        const myFile = bucket.file("uploads/image.png");
+        const myStream = myFile.createWriteStream();
+        file.pipe(myStream).on("finish", () => {
+            console.log("pipe to gcs");
+            res.status(200).send("piped!");
+        });
+    });
+    req.pipe(busboy);
 });
 
 // Start the server
