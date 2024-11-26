@@ -24,7 +24,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Google Cloud Storage (GCS) Setup
-
 const storage = new Storage({
     keyFilename: path.join(__dirname, "./pixplay-442722-419ffc7a2404.json"),
     projectId: "pixplay-442722",
@@ -33,8 +32,6 @@ const storage = new Storage({
 const bucketName = "pixplay-442722.appspot.com"; // reference to bucket
 const bucket = storage.bucket(bucketName); // can do whatever we want to it :)
 // Local Storage Setup
-
-const upload = multer({ dest: "uploads/" });
 
 app.get("/image", (req, res) => {
     try {
