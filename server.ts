@@ -57,16 +57,21 @@ app.get("/image", (req, res) => {
 });
 // Endpoint to handle the image upload. When client uploads image, do this
 app.post("/upload", (req, res) => {
-    const busboy = Busboy({ headers: req.headers }); // get busboyt to remove headers
-    busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
-        const myFile = bucket.file("uploads/image.png");
-        const myStream = myFile.createWriteStream();
-        file.pipe(myStream).on("finish", () => {
-            console.log("pipe to gcs");
-            res.status(200).send("piped!");
+    try {
+        const busboy = Busboy({ headers: req.headers }); // get busboyt to remove headers
+        busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+            const myFile = bucket.file("uploads/image.png");
+            const myStream = myFile.createWriteStream();
+            file.pipe(myStream).on("finish", () => {
+                console.log("pipe to gcs");
+                res.status(200).send("piped!");
+            });
         });
-    });
-    req.pipe(busboy);
+        req.pipe(busboy);
+    } catch (error) {
+        console.log(error);
+        console.log("uh oh");
+    }
 });
 
 // Start the server
