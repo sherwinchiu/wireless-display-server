@@ -25,17 +25,6 @@ const bucket = storage.bucket(bucketName);
 
 // Initialize multer with the storage configuration
 const upload = multer({ dest: "uploads/" });
-// Init Docker
-/*
-app.get("/", (req, res) => {
-    req.get({
-        headers: {
-            "Content-Type": "application/json",
-            host: null,
-        },
-    });
-    res.send("Dockerizing Node Application");
-}); */
 
 // Serve static files (image) from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
