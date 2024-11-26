@@ -32,8 +32,6 @@ const storage = new Storage();
 
 const bucketName = "pixplay-442722.appspot.com"; // reference to bucket
 const bucket = storage.bucket(bucketName); // can do whatever we want to it :)
-// Local Storage Setup
-
 app.get("/image", (req, res) => {
     try {
         // get file from google cloud storage
