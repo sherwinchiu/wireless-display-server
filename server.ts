@@ -58,7 +58,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
             // no file returned
             return res.status(400);
         }
-        const tempFilePath = "./";
+        const tempFilePath = req.file.path;
         const gcsFileName = "image.png";
         console.log("uploading...");
         // upload to gcs bucket! yay image stored
@@ -78,5 +78,5 @@ app.post("/upload", upload.single("file"), (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on ${port}`);
 });
