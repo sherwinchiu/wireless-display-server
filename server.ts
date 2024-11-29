@@ -65,7 +65,7 @@ async function convertBMP(buffer, res) {
 // endpoint to turn image into bmp first, and then send it.
 app.get("/bmp", (req, res) => {
     // get file from google cloud storage
-    console.log("request!");
+    // console.log("request!");
     const gcsFileName = "uploads/image.png"; // Fixed name for the uploaded image
     const file = bucket.file(gcsFileName);
     // check for file existance
