@@ -59,8 +59,8 @@ async function convertBMP(buffer, res) {
     const image = await Jimp.read(buffer); // read buffer, convert to bmp, send
     // image.write("mybmp.bmp"); // testing metadata
     const bmpBuffer = await image.getBuffer("image/bmp");
-    res.status(200);
-    res.end(bmpBuffer);
+    // res.status(200);
+    res.status(200).send(bmpBuffer);
 }
 // endpoint to turn image into bmp first, and then send it.
 app.get("/bmp", (req, res) => {
