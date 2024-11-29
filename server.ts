@@ -7,6 +7,7 @@ import fs from "fs";
 import cors from "cors";
 import { Storage } from "@google-cloud/storage";
 const Busboy = require("busboy");
+import { Jimp, JimpMime } from "jimp";
 
 // Create the Express app
 const app = express();
@@ -52,6 +53,38 @@ app.get("/image", (req, res) => {
     } catch (error) {
         console.log("uh oh");
     }
+});
+
+async function convertBMP(buffer, res) {
+    const image = await Jimp.read(buffer); // read buffer, convert to bmp, send
+    // image.write("mybmp.bmp"); // testing metadata
+    const bmpBuffer = await image.getBuffer("image/bmp");
+    res.status(200);
+    res.end(bmpBuffer);
+}
+// endpoint to turn image into bmp first, and then send it.
+app.get("/bmp", (req, res) => {
+    // get file from google cloud storage
+    console.log("request!");
+    const gcsFileName = "uploads/image.png"; // Fixed name for the uploaded image
+    const file = bucket.file(gcsFileName);
+    // check for file existance
+    const exists = file.exists();
+    if (!exists) {
+        return res.status(404);
+    }
+    // create buffer
+    const readStream = file.createReadStream();
+    const chunks: Buffer[] = [];
+    // create bmp by parsing all data into chunks
+    readStream.on("data", (chunk: Buffer) => {
+        chunks.push(chunk);
+    });
+    // after all data is read, send it over & combine all chunks
+    readStream.on("end", () => {
+        const buffer = Buffer.concat(chunks); // combine all chunks
+        convertBMP(buffer, res);
+    });
 });
 // Endpoint to handle the image upload. When client uploads image, do this
 app.post("/imagehere", (req, res) => {
